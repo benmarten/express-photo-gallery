@@ -6,8 +6,10 @@ var getPayload = require(__dirname + '/lib/get_payload');
 var getS3Payload = require(__dirname + '/lib/get_s3_payload');
 var resolveModulePath = require(__dirname + '/lib/resolve_module_path');
 var mustache = require('mustache');
+var robots = require('express-robots');
 var template = fs.readFileSync(__dirname + '/lib/template.html').toString();
 var url = require('url');
+var path = require('path');
 mustache.parse(template);
 
 module.exports = function(photoPath, options) {
@@ -46,10 +48,15 @@ module.exports = function(photoPath, options) {
 
   }
 
+  app.use(robots({UserAgent: '*', Disallow: '/'}));
+
   app.use(static(resolveModulePath('lightgallery') + '/dist'));
   app.use('/js', static(resolveModulePath('lg-zoom') + '/dist'));
   app.use('/js', static(resolveModulePath('lg-thumbnail') + '/dist'));
   app.use('/js', static(resolveModulePath('lg-fullscreen') + '/dist'));
+  app.use('/js', static(resolveModulePath('lg-autoplay') + '/dist'));
+
+  app.use('/favicon', static(path.join(photoPath, '../favicon')));
 
   app.get('/', function(req, res) {
 
